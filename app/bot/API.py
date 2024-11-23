@@ -50,3 +50,17 @@ class APIHandler:
             return response.json()
         else:
             return {"error": "Error occurred", "status_code": response.status_code}
+        
+    def buy_stars(self) -> dict[str, str]:
+        data = {
+            "galaxy_id": config.GALAXY_ID,
+            "session": self.session_id,
+            "stars": config.STARS_AUTO_BUY_COUNT,
+        }
+        
+        response = requests.post(url=self.BASE_URL + "/stars/create", data=data, headers=self.HEADERS, timeout=30)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {"error": "Error occurred", "status_code": response.status_code}
+        
