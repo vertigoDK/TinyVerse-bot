@@ -11,7 +11,7 @@ This project provides a bot that collects star dust from a service using an API 
 
 Follow these steps to set up and use the bot:
 
-### 1. Obtaining Your Session ID
+### 1. Obtaining Your Session ID and GALAXY_ID
 
 To get your `SESSION_ID`, follow these steps:
 
@@ -21,6 +21,14 @@ To get your `SESSION_ID`, follow these steps:
 4. Trigger a star collection request (perform the action that collects stars)
 5. Find the `POST` request named `collect` in the network logs
 6. In the `Payload` section of the `collect` request, you will find the `session` field. This is your `SESSION_ID`
+
+To get your `GALAXY_ID`, follow these steps:
+1. Open your browser and go to telegram.web
+2. Press `F12` to open the Developer Tools
+3. Go to the `Network` tab
+4. Try to create stars
+5. Find the `POST` request named `create` in the network logs
+6. In the `Payload` section of the `create` request, you will find the `galaxy_id` field. This is your `GALAXY_ID`
 
 ### 2. Finding Your Telegram ID
 
