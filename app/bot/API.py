@@ -33,7 +33,7 @@ class APIHandler:
             "session": self.session_id,
         }
 
-        response = requests.post(url=self.BASE_URL + "/galaxy/collect", data=data, headers=self.HEADERS)
+        response = requests.post(url=self.BASE_URL + "/galaxy/collect", data=data, headers=self.HEADERS, timeout=30)
 
         if response.status_code == 200:
             return response.json()
@@ -45,7 +45,7 @@ class APIHandler:
         data = {
             "session": self.session_id,
         }
-        response = requests.post(url=self.BASE_URL + "/user/info", data=data, headers=self.HEADERS)
+        response = requests.post(url=self.BASE_URL + "/user/info", data=data, headers=self.HEADERS, timeout=30)
         if response.status_code == 200:
             return response.json()
         else:
