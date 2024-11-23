@@ -1,8 +1,3 @@
-from dotenv import load_dotenv
-
-load_dotenv()
-
-import os
 
 # Telegram Bot Configuration
 BOT_TOKEN = "your_telegram_bot_token"  # Replace with your actual bot token
