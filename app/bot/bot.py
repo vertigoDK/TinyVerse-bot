@@ -1,79 +1,67 @@
+import asyncio
 from .API import APIHandler
 from ..telegram_bot.telegram_service import notify
-import time
-import config
 from ..tools.generate_random_between_range import generate_random_between_range
+import config
+import logging
+import time
+
+
+logging.basicConfig(level=logging.INFO)
 
 class Bot:
     def __init__(self):
-        # Time interval for collecting stars in seconds
         self.tolerance_from: int = config.TOLERANCE_FROM
         self.tolerance_to: int = config.TOLERANCE_TO
         self.api_handler = APIHandler()
         self.stats_per_request = config.STATS_PER_REQUEST
 
-
     async def run(self):
         if config.SEND_TO_TELEGRAM:
             await notify(message="Bot started!")
-            
-        stats_per_request = self.stats_per_request
-            
+        
         while True:
-
             try:
+                await self._collect_stars()
+                await self._handle_statistics()
+                await self._attempt_auto_buy()
                 
-                # Collect stars through API
-                response: dict[str, str] = self.api_handler.collect_stars()
-                stats_per_request -= 1
-
-                # Reset the statistics request counter
-                # Notify about the collected dust
-                if response["response"]["success"] == 1:
-                    print(f"🌌 Successfully collected {response['response']['dust']} stardust.")
-
-
-                if stats_per_request == 0:
-                    response_stats: dict[str,str] = self.api_handler.check_stats()
-                    
-                    format_response_data = self._format_stats(response_stats)
-                    
-                    if config.SEND_TO_TELEGRAM:
-                        await notify(
-                            message=format_response_data
-                        )
-                    print(format_response_data)
-                    stats_per_request = self.stats_per_request
-
-                # try to buy stars     
-                if config.STARS_AUTO_BUY:
-                    self.api_handler.buy_stars()
-                
-                            
-                # Random interval between requests
-                time_to_collect: int = generate_random_between_range(self.tolerance_from, self.tolerance_to)
-                
-                time.sleep(time_to_collect)
+                # Random sleep interval
+                time_to_collect = generate_random_between_range(self.tolerance_from, self.tolerance_to)
+                await asyncio.sleep(time_to_collect)
 
             except Exception as e:
-                time.sleep(time_to_collect)
-                print(f"Error while processing {e}")
+                logging.error(f"Error while processing: {e}", exc_info=True)
                 await notify(message=f"Error while processing: {e}")
 
+    async def _collect_stars(self):
+        """Collect stars through the API and notify if successful."""
+        response = self.api_handler.collect_stars()
+        if response.get("response", {}).get("success") == 1:
+            dust = response["response"]["dust"]
+            logging.info(f"🌌 Successfully collected {dust} stardust.")
+        else:
+            logging.warning("Failed to collect stars.")
 
+    async def _handle_statistics(self):
+        """Send statistics update when required."""
+        self.stats_per_request -= 1
+        if self.stats_per_request == 0:
+            response_stats = self.api_handler.check_stats()
+            formatted_stats = self._format_stats(response_stats)
+            
+            if config.SEND_TO_TELEGRAM:
+                await notify(message=formatted_stats)
+            
+            logging.info(formatted_stats)
+            self.stats_per_request = config.STATS_PER_REQUEST
 
-
-
-
-
-
+    async def _attempt_auto_buy(self):
+        """Try to buy stars if the feature is enabled."""
+        if config.STARS_AUTO_BUY:
+            self.api_handler.buy_stars()
 
     def _format_stats(self, stats: dict) -> str:
-        """
-        Formats the statistics into a neat text for Telegram and the console.
-        :param stats: Dictionary with statistics data.
-        :return: Formatted string.
-        """
         response = stats.get("response", {})
         return (
             f"📊 User Statistics\n\n"
