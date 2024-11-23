@@ -5,9 +5,9 @@ load_dotenv()
 import os
 
 # Telegram Bot Configuration
-BOT_TOKEN = os.getenv('BOT_TOKEN')# Replace with your actual bot token
-SESSION_ID = os.getenv('SESSION_ID')         # Replace with your actual session ID
-TELEGRAM_ID = os.getenv('TELEGRAM_ID')       # Replace with your actual Telegram ID
+BOT_TOKEN = "your_telegram_bot_token"  # Replace with your actual bot token
+SESSION_ID = "your_session_id"         # Replace with your actual session ID
+TELEGRAM_ID = "your_telegram_id"       # Replace with your actual Telegram ID
 
 # Set to True if you want to send messages to Telegram, otherwise set to False
 SEND_TO_TELEGRAM = True
